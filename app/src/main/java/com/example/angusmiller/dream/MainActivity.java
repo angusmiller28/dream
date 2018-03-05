@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
         prepareRecordData();
 
+        // Floating Action Bar Config
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
