@@ -10,10 +10,21 @@ public class Record {
     public Record(){
     }
 
-    public Record(String date, String duration, String period){
+    public Record(String date, String period){
         this.date = date;
-        this.duration = duration;
+        this.duration = "";
         this.period = period;
+    }
+
+//    public Record(String date, String duration, String period){
+//        this.date = date;
+//        this.duration = duration;
+//        this.period = period;
+//    }
+
+    public void updateRecord(String duration, String period){
+        this.duration = duration;
+        this.period = this.period + " - " + period;
     }
 
     public String getDate() {

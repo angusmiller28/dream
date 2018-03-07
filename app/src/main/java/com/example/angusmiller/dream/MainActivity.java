@@ -1,5 +1,6 @@
 package com.example.angusmiller.dream;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -12,8 +13,11 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     private List<Record> movieList = new ArrayList<>();
@@ -36,33 +40,51 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
-        prepareRecordData();
-
         // Floating Action Bar Config
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        final boolean[] flag_clicked = {true};
+        final Record[] record = new Record[1];
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
+                if (flag_clicked[0]){
+                    Snackbar.make(view, "Record added! We have just started recording your sleep pattern.", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    fab.setImageResource(R.drawable.stop);
+                    record[0] = addRecordData();
+                    flag_clicked[0] = false;
+                } else {
+                    Snackbar.make(view, "Record stop! We have just stopped recording your sleep pattern.", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    fab.setImageResource(R.drawable.start);
+                    stopRecordData(record[0]);
+                    flag_clicked[0] = true;
+                }
             }
         });
     }
 
-    private void prepareRecordData() {
-        Record record = new Record("Mad Max: Fury Road", "Action & Adventure", "2015");
+    private Record addRecordData() {
+        // get data
+        String date = new SimpleDateFormat("EEE, d MMM", Locale.getDefault()).format(new Date());
+        String startTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(new Date());
+        Record record = new Record(date, startTime);
         movieList.add(record);
 
-        record = new Record("Inside Out", "Animation, Kids & Family", "2015");
-        movieList.add(record);
+        mAdapter.notifyDataSetChanged();
+        return  record;
+    }
 
-        record = new Record("Star Wars: Episode VII - The Force Awakens", "Action", "2015");
-        movieList.add(record);
+    private void stopRecordData(Record record) {
+        // get data
+        String endTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(new Date());
+        record.updateRecord("8 hours 44 minutes", endTime);
 
         mAdapter.notifyDataSetChanged();
     }
 
-        @Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -72,15 +94,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        // Handle item selection
+        Intent intent;
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                intent = new Intent(this, settings.class);
+                startActivity(intent);
+                return true;
+            case R.id.action_history:
+                intent = new Intent(this, Graph.class);
+                startActivity(intent);
+                return true;
+            case R.id.action_records:
+                intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 }
